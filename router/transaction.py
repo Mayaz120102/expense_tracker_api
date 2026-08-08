@@ -47,3 +47,24 @@ def get_all_transaction(user: user_dependency, db: db_dependency):
         raise HTTPException(status_code=401, detail="Authentication failed")
 
     return db.query(Transaction).filter(Transaction.owner_id == user.get("id")).all()
+
+
+@router.get("/transactions/{transaction_id}")
+def get_specific_transaction(
+    user: user_dependency, db: db_dependency, transaction_id: int
+):
+
+    if user is None:
+        raise HTTPException(status_code=401, detail="Authentication Failed")
+
+    specific_transaction = (
+        db.query(Transaction)
+        .filter(Transaction.owner_id == user.get("id"))
+        .filter(Transaction.id == transaction_id)
+        .first()
+    )
+
+    if specific_transaction is not None:
+        return specific_transaction
+    else:
+        raise HTTPException(status_code=404, detail="Transaction not found")
