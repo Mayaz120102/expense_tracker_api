@@ -1,21 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import JSONResponse
-from typing import Annotated
 from datetime import datetime, timedelta, timezone
+from typing import Annotated
 
-from pydantic import BaseModel, Field
-from sqlalchemy.orm import Session
-from models import Users
-from database import SessionLocal
-from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt
+from passlib.context import CryptContext
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
+from database import SessionLocal
+from models import Users
 
 router = APIRouter()
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-OAuth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
+OAuth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
 SECRET_KEY = "7a0b409366e78720240c6d21f0b4b145600221b4c7ceab96fcb2a0c28e029cb2"
@@ -56,21 +55,19 @@ def create_access_token(username: str, user_id: int, expire_delta: timedelta):
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def get_current_user(token: Annotated[str, Depends[OAuth2_bearer]]):
+def get_current_user(token: Annotated[str, Depends(OAuth2_bearer)]):
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         user_id: int = payload.get("id")
 
-
         if username is None or user_id is None:
             raise HTTPException(status_code=401, detail="user not found")
 
-        return {"username": username, "id":user_id}
+        return {"username": username, "id": user_id}
     except:
         raise HTTPException(status_code=401, detail="user not found")
-
 
 
 def get_db():
