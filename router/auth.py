@@ -109,3 +109,5 @@ def login_user(
     token = create_access_token(user.username, user.id, timedelta(minutes=30))
 
     return {"access_token": token, "token_type": "bearer"}
+
+
