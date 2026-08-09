@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import Column, Date, ForeignKey, Integer, String
+from sqlalchemy import Column, Date, Float, ForeignKey, Integer, String
 
 from database import Base
 
@@ -17,12 +17,13 @@ class Users(Base):
 
 class Transaction(Base):
 
-    __tablename__ = 'transaction'
+    __tablename__ = 'transactions'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     title = Column(String)
-    amount = Column(String)
-    category = Column(Integer)
+    amount = Column(Float, nullable=False)
+    type = Column(String, nullable=False)
+    category = Column(String)
     date = Column(Date, default=date.today, nullable=False)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    owner_id = Column(Integer, ForeignKey("users.id"), index=True)
     
